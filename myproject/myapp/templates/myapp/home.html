@@ -1,0 +1,23 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card text-center p-5 shadow-lg" style="width: 500px; border-radius: 15px;">
+        <h1 class="display-4 mb-4" style="font-size: 2.5rem;">Welcome to the Tournament Organizer</h1>
+        <p class="lead mb-4" style="font-size: 1.25rem;">Manage your teams and matches easily!</p>
+
+        <div class="image mb-4">
+            <img src="{% static 'myapp/logo.jpg' %}" alt="logo" class="img-fluid rounded-circle" width="250px" height="250px">
+        </div>
+
+        <form action="{% url 'matches' %}" method="get">
+            <button type="submit" class="btn btn-primary btn-lg">
+                Start
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

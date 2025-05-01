@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Your Teams</h2>
+  <ul>
+    {% for team in teams %}
+      <li>{{ team.name }}</li>
+    {% empty %}
+      <li>You haven't created any teams yet.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

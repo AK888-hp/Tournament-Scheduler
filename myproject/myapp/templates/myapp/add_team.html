@@ -1,0 +1,54 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+
+{% block title %}Teams{% endblock %}
+
+{% block content %}
+    <h2>Teams</h2>
+
+   
+        <ul>
+            {% for team in teams %}
+                <li>{{ team.team_name }}</li>
+            {% endfor %}
+        </ul>
+   
+        {% extends 'myapp/base.html' %}
+        {% block title %}Add Team{% endblock %}
+        
+        {% block content %}
+        <div class="container my-4">
+            <h2>Create a New Team</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="team_name" class="form-label">Team Name</label>
+                    <input type="text" class="form-control" id="team_name" name="team_name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="team_logo" class="form-label">Team Logo</label>
+                    <input type="file" class="form-control" id="team_logo" name="team_logo">
+                </div>
+                <button type="submit" class="btn btn-primary">Create Team</button>
+            </form>
+        </div>
+        {% endblock %}
+        
+
+    <button onclick="toggleForm()">➕ Add Team</button>
+
+    <div id="addTeamForm" style="display: none; margin-top: 1rem;">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleForm() {
+            const form = document.getElementById('addTeamForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+{% endblock %}

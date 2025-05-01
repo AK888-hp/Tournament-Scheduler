@@ -1,0 +1,23 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Player Stats{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Stats for {{ player.name }}</h2>
+
+    {% if stats %}
+        <div class="list-group">
+            {% for stat in stats %}
+                <div class="list-group-item">
+                    <h5>Role: {{ stat.role }}</h5>
+                    <p>Runs: {{ stat.runs }}</p>
+                    <p>Wickets: {{ stat.wickets }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center">No stats available for this player.</p>
+    {% endif %}
+</div>
+{% endblock %}

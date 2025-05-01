@@ -1,0 +1,38 @@
+{% extends 'myapp/base.html' %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="mb-4">Login</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    {{ form.username }}  <!-- Django will render the field here -->
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    {{ form.password }}  <!-- Django will render the password field here -->
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <a href="{% url 'signup' %}" class="btn btn-link">Sign Up</a>
+                </div>
+            </form>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger mt-3">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

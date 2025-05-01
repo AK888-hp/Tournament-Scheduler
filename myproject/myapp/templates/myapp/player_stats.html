@@ -1,0 +1,32 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}{{ player.name }}'s Stats{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">{{ player.name }}'s Stats</h1>
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Player Information</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Team:</strong> {{ player.team.name }}</p>
+            <p><strong>Role:</strong> {{ player.role }}</p>
+            <hr>
+            <h5>Player Stats</h5>
+            <ul class="list-group">
+                <li class="list-group-item"><strong>Runs:</strong> {{ stats.runs }}</li>
+                <li class="list-group-item"><strong>Wickets:</strong> {{ stats.wickets }}</li>
+                <li class="list-group-item"><strong>Catches:</strong> {{ stats.catches }}</li>
+                <li class="list-group-item"><strong>Batting Average:</strong> {{ stats.average }}</li>
+                <!-- Add more stats here if needed -->
+            </ul>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'player_list' %}" class="btn btn-primary">Back to Player List</a>
+    </div>
+</div>
+{% endblock %}

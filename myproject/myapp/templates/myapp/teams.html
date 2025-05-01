@@ -1,0 +1,72 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+
+{% block title %}Teams{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row mb-4 justify-content-center">
+        <div class="col-md-8">
+            <h2>Select a Team</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <form method="get" class="d-inline">
+                <select name="team_id" class="form-select d-inline w-auto" onchange="this.form.submit()">
+                    <option value="">-- Choose a Team --</option>
+                    {% for team in teams %}
+                        <option value="{{ team.id }}" {% if selected_team and team.id == selected_team.id %}selected{% endif %}>
+                            {{ team.team_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </div>
+
+    {% if selected_team %}
+        <div class="card shadow-sm mx-auto" style="width: 80%; max-width: 900px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">{{ selected_team.team_name }}</h4>
+
+                {% if selected_team.team_logo %}
+                    <img src="{{ selected_team.team_logo.url }}" alt="{{ selected_team.team_name }} logo" class="img-fluid my-3" style="max-height: 150px; display: block; margin-left: auto; margin-right: auto;">
+                {% endif %}
+
+                <table class="table table-bordered table-striped align-middle mt-3">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Age</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in players %}
+                            <tr>
+                                <td>{{ player.name }}</td>
+                                <td>{{ player.position }}</td>
+                                <td>{{ player.age }}</td>
+                                <td>
+                                    <div class="d-flex gap-3 justify-content-center">
+                                        <a href="{% url 'add_player_stats' player.id %}" class="btn btn-success btn-sm">Add Stats</a>
+                                        <a href="{% url 'player_stats' player.id %}" class="btn btn-primary btn-sm">View Stats</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No players in this team.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="text-end">
+                    <a href="{% url 'add_player' %}" class="btn btn-warning">Add Player</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

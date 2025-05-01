@@ -1,0 +1,36 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Player List{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Player List</h2>
+
+    {% if players %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Player Name</th>
+                    <th scope="col">Team</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Runs</th>
+                    <th scope="col">Wickets</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                    <tr>
+                        <td>{{ player.player_name }}</td>
+                        <td>{{ player.team.name }}</td>
+                        <td>{{ player.role }}</td>
+                        <td>{{ player.runs }}</td>
+                        <td>{{ player.wickets }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-center">No players found.</p>
+    {% endif %}
+</div>
+{% endblock %}

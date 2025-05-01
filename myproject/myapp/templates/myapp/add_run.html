@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Add Runs to {{ player.name }}</h2>
+  <form method="POST">
+    {% csrf_token %}
+    <input type="number" name="runs" placeholder="Enter runs" required>
+    <button type="submit">Add</button>
+  </form>
+{% endblock %}

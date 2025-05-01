@@ -1,0 +1,17 @@
+<!-- myapp/templates/myapp/team_detail.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Team Detail</title>
+</head>
+<body>
+    <h1>{{ team.name }}</h1>
+    <p>Coach: {{ team.coach }}</p>
+    <p>Players:</p>
+    <ul>
+        {% for player in team.player_set.all %}
+            <li>{{ player.name }} - {{ player.position }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
