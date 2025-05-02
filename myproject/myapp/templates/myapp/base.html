@@ -26,12 +26,13 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'teams' %}">Players</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'matches' %}">Matches</a>
-                    </li>
                     
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'add_team' %}">Teams</a>
+                        <a href="{% url 'generate_schedule' %}" class="nav-link">Matches</a>
+
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'team_list' %}">Teams</a>
                     </li>
                 </ul>
                 <div class="d-flex">
@@ -39,6 +40,12 @@
                     {% if user.is_authenticated %}
                     <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
                     {% else %}
+                    <div class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </div>
+                    <div class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Signup</a>
+                    </div>
                     {% endif %}
                 </div>
             </div>

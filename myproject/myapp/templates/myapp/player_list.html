@@ -12,19 +12,17 @@
                 <tr>
                     <th scope="col">Player Name</th>
                     <th scope="col">Team</th>
-                    <th scope="col">Role</th>
-                    <th scope="col">Runs</th>
-                    <th scope="col">Wickets</th>
+                    <th scope="col">Position</th>  <!-- Changed role to position -->
+                    <th scope="col">Age</th>        <!-- Assuming you have age -->
                 </tr>
             </thead>
             <tbody>
                 {% for player in players %}
                     <tr>
-                        <td>{{ player.player_name }}</td>
-                        <td>{{ player.team.name }}</td>
-                        <td>{{ player.role }}</td>
-                        <td>{{ player.runs }}</td>
-                        <td>{{ player.wickets }}</td>
+                        <td>{{ player.name }}</td>  <!-- Correct field name -->
+                        <td>{{ player.team.team_name }}</td>  <!-- Access team name -->
+                        <td>{{ player.position }}</td>  <!-- Correct field name -->
+                        <td>{{ player.age }}</td>  <!-- Assuming you have age -->
                     </tr>
                 {% endfor %}
             </tbody>

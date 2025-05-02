@@ -1,0 +1,40 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <div class="container mt-5 pt-5">
+        <h1 class="mb-4">Schedule Matches</h1>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="start_date" class="form-label">Start Date:</label>
+                <input type="date" name="start_date" id="start_date" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Schedule</button>
+        </form>
+
+        {% if scheduled_matches %}
+            <h2 class="mt-5">Scheduled Matches</h2>
+            <table class="table table-bordered mt-3">
+                <thead>
+                    <tr>
+                        <th>Match</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for match in scheduled_matches %}
+                        <tr>
+                            <td>{{ match.team1 }} vs {{ match.team2 }}</td>
+                            <td>{{ match.match_date|date:"F j, Y" }}</td>
+                            <td>{{ match.start_time|time:"g:i A" }} - {{ match.end_time|time:"g:i A" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,12 +1,78 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Team, Player, Match, PlayerStats
-from .forms import PlayerStatsForm, TeamForm, PlayerForm,ScheduleForm
+from pyexpat.errors import messages
+from django.shortcuts import get_object_or_404, render, redirect
+from .models import Player, Team, Match
+from datetime import datetime, timedelta
+from itertools import combinations
+from .forms import PlayerForm, PlayerStatsForm, TeamForm
+
+def generate_schedule(request):
+    if request.method == 'POST':
+        start_date = request.POST['start_date']
+        schedule_matches(start_date)
+        return redirect('home')  # or wherever you want
+
+    return render(request, 'myapp/schedule_form.html')
+
+
+# -------------------- MATCH VIEWS --------------------
 from datetime import datetime, timedelta, time
+from itertools import combinations
+from django.shortcuts import render
+from .models import Match, Team
+
+from django.shortcuts import render
+from datetime import datetime, timedelta
+from itertools import combinations
+from .models import Match, Team
+
+def schedule_matches(request):
+    if request.method == 'POST':
+        start_date_str = request.POST.get('start_date')
+        if start_date_str:
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+
+            # Clear old matches and regenerate
+            Match.objects.all().delete()
+
+            teams = list(Team.objects.all())
+            time_slots = [("15:30", "19:00"), ("19:30", "23:00")]  # 12-hr shown in template
+
+            matchups = list(combinations(teams, 2))  # Round-robin
+            day_offset = 0
+            slot_index = 0
+
+            for team1, team2 in matchups:
+                match_date = start_date + timedelta(days=day_offset)
+                start_time = datetime.strptime(time_slots[slot_index][0], "%H:%M").time()
+                end_time = datetime.strptime(time_slots[slot_index][1], "%H:%M").time()
+
+                Match.objects.create(
+                    team1=team1,
+                    team2=team2,
+                    match_date=match_date,
+                    start_time=start_time,
+                    end_time=end_time
+                )
+
+                slot_index += 1
+                if slot_index >= len(time_slots):
+                    slot_index = 0
+                    day_offset += 1
+
+    # Always load saved matches from DB for display
+    scheduled_matches = Match.objects.all().order_by('match_date', 'start_time')
+
+    return render(request, 'myapp/scheduler.html', {
+        'scheduled_matches': scheduled_matches
+    })
+
 
 
 # -------------------- GENERAL VIEWS --------------------
 def home(request):
     return render(request, 'myapp/home.html')
+def login(request):
+    return render(request, 'myapp/login.html')
 
 
 def profile(request):
@@ -56,7 +122,7 @@ def team_detail(request, team_id):
 
 # -------------------- PLAYER VIEWS --------------------
 def player_list(request):
-    players = Player.objects.all()
+    players = Player.objects.all()  # Fetching all players from the database
     return render(request, 'myapp/player_list.html', {'players': players})
 
 
@@ -70,97 +136,6 @@ def add_player(request):
         form = PlayerForm()
 
     return render(request, 'myapp/add_player.html', {'form': form})
-
-
-# -------------------- MATCH VIEWS --------------------
-def match_list(request):
-    matches = Match.objects.all().order_by('match_date', 'start_time')
-    error = None
-
-    if request.method == 'POST':
-        form = ScheduleForm(request.POST)
-        if form.is_valid():
-            start_date = form.cleaned_data['start_date']
-            teams = list(Team.objects.all())
-
-            if len(teams) < 4:
-                error = 'At least 4 teams are required to schedule matches.'
-            else:
-                Match.objects.all().delete()
-
-                slot1 = (time(15, 30), time(19, 0))   # 3:30 PM – 7:00 PM
-                slot2 = (time(19, 30), time(23, 0))   # 7:30 PM – 11:00 PM
-
-                day = 0
-                for i in range(0, len(teams), 4):
-                    if i + 3 >= len(teams):
-                        break
-                    t1, t2, t3, t4 = teams[i], teams[i+1], teams[i+2], teams[i+3]
-                    match_day = start_date + timedelta(days=day)
-
-                    Match.objects.create(
-                        team1=t1,
-                        team2=t2,
-                        match_date=match_day,
-                        start_time=datetime.combine(match_day, slot1[0]),
-                        end_time=datetime.combine(match_day, slot1[1])
-                    )
-                    Match.objects.create(
-                        team1=t3,
-                        team2=t4,
-                        match_date=match_day,
-                        start_time=datetime.combine(match_day, slot2[0]),
-                        end_time=datetime.combine(match_day, slot2[1])
-                    )
-                    day += 1
-
-                return redirect('match_list')
-    else:
-        form = ScheduleForm()
-
-    return render(request, 'myapp/match-list.html', {
-        'form': form,
-        'matches': matches,
-        'error': error,
-    })
-
-def schedule_matches(request):
-    teams = list(Team.objects.all())
-    if len(teams) < 4:
-        return render(request, 'myapp/match-list.html', {'error': 'At least 4 teams required to schedule matches.'})
-
-    Match.objects.all().delete()  # Clear old matches
-
-    current_date = datetime.now().date()
-    match_duration_1 = (time(15, 30), time(19, 0))  # 3:30 PM to 7:00 PM
-    match_duration_2 = (time(19, 30), time(23, 0))  # 7:30 PM to 11:00 PM
-
-    day = 0
-    for i in range(0, len(teams), 4):
-        if i + 3 >= len(teams):
-            break
-
-        t1, t2, t3, t4 = teams[i], teams[i + 1], teams[i + 2], teams[i + 3]
-        match_day = current_date + timedelta(days=day)
-
-        Match.objects.create(
-            team1=t1,
-            team2=t2,
-            match_date=match_day,
-            start_time=datetime.combine(match_day, match_duration_1[0]),
-            end_time=datetime.combine(match_day, match_duration_1[1])
-        )
-        Match.objects.create(
-            team1=t3,
-            team2=t4,
-            match_date=match_day,
-            start_time=datetime.combine(match_day, match_duration_2[0]),
-            end_time=datetime.combine(match_day, match_duration_2[1])
-        )
-
-        day += 1
-
-    return redirect('match_list')
 
 
 # -------------------- PLAYER STATS VIEWS --------------------
@@ -183,9 +158,41 @@ def add_player_stats(request, player_id):
     else:
         form = PlayerStatsForm()
 
-    return render(request, 'add_player_stats.html', {'form': form, 'player': player})
+    return render(request, 'myapp/add_player_stats.html', {'form': form, 'player': player})
 
+def match_list(request):
+    matches = Match.objects.all()  # Fetch all matches
+    return render(request, 'myapp/match_list.html', {'matches': matches})  # Return a template with matches
+def team_list(request):
+    teams = Team.objects.all()
+    selected_team = None
+    players = []
 
-# -------------------- STANDINGS VIEW --------------------
-def standings(request):
-    return render(request, 'myapp/standings.html')
+    # Handle team selection
+    team_id = request.GET.get('team_id')
+    if team_id:
+        selected_team = get_object_or_404(teams, id=team_id)
+        players = selected_team.player_set.all()
+
+    # Handle team creation
+    if request.method == 'POST':
+        team_name = request.POST.get('team_name')
+        coach_name = request.POST.get('coach_name')
+        team_logo = request.FILES.get('team_logo')
+
+        if team_name:
+            Team.objects.create(team_name=team_name, coach_name=coach_name, team_logo=team_logo)
+            return render(request, 'myapp/add_player_stats.html', {'form': form, 'player': player})
+
+    return render(request, 'myapp/team_list.html', {
+        'teams': teams,
+        'selected_team': selected_team,
+        'players': players,
+    })
+def delete_team(request, team_id):
+    team = get_object_or_404(Team, id=team_id)
+    if request.method == 'POST':
+        team.delete()
+        messages.success(request, 'Team deleted successfully.')
+        return redirect('myapp/team_list')  # Redirect to team list page after deletion
+    return redirect('myapp/team_list')

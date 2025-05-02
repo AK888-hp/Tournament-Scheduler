@@ -1,32 +1,13 @@
 from django.db import models
-from django.contrib.auth.models import User
-
-
-class User(models.Model):
-    ROLE_CHOICES = [
-        ('admin', 'Admin'),
-        ('team_owner', 'Team Owner'),
-        ('player', 'Player'),
-        ('guest', 'Guest'),
-    ]
-    username = models.CharField(max_length=100)
-    email = models.EmailField()
-    password_hash = models.CharField(max_length=255)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.username
-
 
 class Team(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)  # Default to user with ID 1
     team_name = models.CharField(max_length=100)
+    coach_name = models.CharField(max_length=100, null=True, blank=True)  # Add this field
+
     team_logo = models.ImageField(upload_to='team_logos/', null=True, blank=True)
 
     def __str__(self):
         return self.team_name
-
 
 class Player(models.Model):
     name = models.CharField(max_length=100)
@@ -37,18 +18,17 @@ class Player(models.Model):
     def __str__(self):
         return self.name
 
-
 class Match(models.Model):
-    team1 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team1_matches')
-    team2 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team2_matches')
+    team1 = models.ForeignKey(Team, related_name='team1_matches', on_delete=models.CASCADE)
+    team2 = models.ForeignKey(Team, related_name='team2_matches', on_delete=models.CASCADE)
     match_date = models.DateField()
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    start_time = models.TimeField(null=True)
+    end_time = models.TimeField(null=True)  # Make sure this is added
+    result = models.CharField(max_length=100)
 
     def __str__(self):
         return f"{self.team1} vs {self.team2} on {self.match_date}"
 
-# ✅ Properly placed at the top level
 class PlayerStats(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='playerstats')
     role = models.CharField(max_length=100)
