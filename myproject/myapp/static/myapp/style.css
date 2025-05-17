@@ -1,4 +1,34 @@
 /* style.css */
+.navbar-nav .nav-link {
+  color: #ddd;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.navbar-brand {
+  transition: color 0.3s ease;
+}
+
+.navbar-brand:hover {
+  color: #f8f9fa;
+}
+body {
+  background: url('/static/myapp/background.png') no-repeat center center fixed;
+  background-size: cover;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.7); /* white with 70% opacity */
+  z-index: -1;
+}
 
 body {
   margin: 0;
@@ -74,7 +104,6 @@ body.dark-mode .btn {
   background-color: #2962ff;
   color: white;
 }
-
 body.dark-mode .btn:hover {
   background-color: #0039cb;
 }

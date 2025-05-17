@@ -3,21 +3,161 @@
 {% block title %}Player Stats{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Stats for {{ player.name }}</h2>
+<style>
+  /* Container and card styles */
+  .stats-container {
+    max-width: 700px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background: rgba(33, 37, 41, 0.85);
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    color: #f1f1f1;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
 
-    {% if stats %}
-        <div class="list-group">
-            {% for stat in stats %}
-                <div class="list-group-item">
-                    <h5>Role: {{ stat.role }}</h5>
-                    <p>Runs: {{ stat.runs }}</p>
-                    <p>Wickets: {{ stat.wickets }}</p>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p class="text-center">No stats available for this player.</p>
-    {% endif %}
+  .stat-card {
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    position: relative;
+    transition: transform 0.25s ease, background-color 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+    background: rgba(0, 123, 255, 0.25);
+  }
+
+  .stat-card h5 {
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .stat-card p {
+    margin: 0.25rem 0;
+    font-size: 1.05rem;
+  }
+
+  /* Delete button */
+  .delete-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  /* Toggle dark mode button */
+  .toggle-dark-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 999;
+    border-radius: 0.6rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    font-weight: 600;
+  }
+
+  /* Light mode styles */
+  body.light-mode {
+    background-color: #f0f2f5;
+    color: #222;
+  }
+
+  body.light-mode .stats-container {
+    background: #fff;
+    color: #222;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+
+  body.light-mode .stat-card {
+    background: #f8f9fa;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  body.light-mode .stat-card:hover {
+    background: #dbe9ff;
+  }
+</style>
+
+<button class="btn btn-outline-light toggle-dark-btn" onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
+
+<div class="container stats-container">
+  <h2 class="text-center mb-4">{{ player.name }}'s Stats</h2>
+
+  {% if stats %}
+    {% for stat in stats %}
+      <div class="stat-card" id="stat-{{ stat.id }}">
+        <h5>Role: {{ stat.role }}</h5>
+        <p>Runs: {{ stat.runs }}</p>
+        <p>Wickets: {{ stat.wickets }}</p>
+        <button class="btn btn-sm btn-danger delete-btn" onclick="deleteStat({{ stat.id }}, '{{ stat.role }}')">
+          <i class="bi bi-trash"></i> Delete
+        </button>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="text-center text-muted">No stats available for this player.</p>
+  {% endif %}
 </div>
+
+<script>
+  function toggleDarkMode() {
+    document.body.classList.toggle('light-mode');
+    const btn = document.querySelector('.toggle-dark-btn');
+    if(document.body.classList.contains('light-mode')) {
+      btn.textContent = '🌙 Toggle Dark Mode';
+      btn.classList.remove('btn-outline-light');
+      btn.classList.add('btn-outline-dark');
+    } else {
+      btn.textContent = '🌞 Toggle Light Mode';
+      btn.classList.remove('btn-outline-dark');
+      btn.classList.add('btn-outline-light');
+    }
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function deleteStat(statId, role) {
+    if(confirm(`Are you sure you want to delete the stat for role "${role}"? This action cannot be undone.`)) {
+      fetch("{% url 'delete_player_stat' 0 %}".replace('0', statId), {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'Content-Type': 'application/json'
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.success) {
+          alert('Stat deleted successfully.');
+          const statCard = document.getElementById(`stat-${statId}`);
+          if(statCard) statCard.remove();
+        } else {
+          alert('Error deleting stat: ' + (data.error || 'Unknown error'));
+        }
+      })
+      .catch(error => alert('Request failed: ' + error));
+    }
+  }
+</script>
 {% endblock %}

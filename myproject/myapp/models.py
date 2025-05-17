@@ -37,3 +37,4 @@ class PlayerStats(models.Model):
 
     def __str__(self):
         return f"{self.player.name} - {self.role} - Runs: {self.runs} - Wickets: {self.wickets}"
+

@@ -4,19 +4,94 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card text-center p-5 shadow-lg" style="width: 500px; border-radius: 15px;">
-        <h1 class="display-4 mb-4" style="font-size: 2.5rem;">Welcome to the Tournament Organizer</h1>
-        <p class="lead mb-4" style="font-size: 1.25rem;">Manage your teams and matches easily!</p>
+<style>
+    body {
+        background-image: url('{% static "myapp/backgrounds/cricket-bg.png" %}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        color: #eee;
+    }
 
-        <div class="image mb-4">
-            <img src="{% static 'myapp/logo.jpg' %}" alt="logo" class="img-fluid rounded-circle" width="250px" height="250px">
-        </div>
+    .full-height-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
 
+    .overlay {
+        background-color: rgba(30, 30, 30, 0.85); /* dark translucent */
+        padding: 60px 30px;
+        border-radius: 15px;
+        max-width: 700px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+        transition: box-shadow 0.3s ease;
+    }
+
+    .overlay:hover {
+        box-shadow: 0 0 40px rgba(255, 255, 255, 0.25);
+    }
+
+    .logo-img {
+        max-width: 200px;
+        margin-bottom: 30px;
+        transition: transform 0.3s ease;
+        filter: drop-shadow(0 0 3px #fff);
+    }
+
+    .logo-img:hover {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 6px #fff);
+    }
+
+    h1.display-4 {
+        color: #fff;
+        font-weight: 700;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.6);
+    }
+
+    p.lead {
+        color: #ccc;
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+        text-shadow: 0 0 3px rgba(0,0,0,0.7);
+    }
+
+    .btn-custom {
+        padding: 12px 24px;
+        font-size: 1.2rem;
+        border-radius: 8px;
+        background-color: #28a745; /* a nice green */
+        border: none;
+        color: white;
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.6);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn-custom:hover {
+        background-color: #218838;
+        box-shadow: 0 6px 16px rgba(33, 136, 56, 0.8);
+        transform: scale(1.05);
+    }
+</style>
+
+<div class="container full-height-container">
+    <div class="overlay">
+        <!-- Logo -->
+        <img src="{% static 'myapp/logo.png' %}" alt="Tournament Logo" class="logo-img">
+
+        <!-- Title and description -->
+        <h1 class="display-4 fw-bold mb-4">Tournament Organizer</h1>
+        <p class="lead mb-4">Plan, schedule, and manage matches with ease and efficiency.</p>
+
+        <!-- Button -->
         <form action="{% url 'matches' %}" method="get">
-            <button type="submit" class="btn btn-primary btn-lg">
-                Start
-            </button>
+            <button type="submit" class="btn btn-custom shadow">Get Started</button>
         </form>
     </div>
 </div>

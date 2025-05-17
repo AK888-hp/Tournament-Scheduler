@@ -19,8 +19,17 @@ class TeamForm(forms.ModelForm):
     class Meta:
         model = Team
         fields = ['team_name', 'team_logo']
+from django import forms
+
 class ScheduleForm(forms.Form):
-    start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    start_date = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control form-control-lg shadow rounded',
+            'placeholder': 'Select a start date'
+        })
+    )
+
 class PlayerStatsForm(forms.ModelForm):
     class Meta:
         model = PlayerStats

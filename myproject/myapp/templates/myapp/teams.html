@@ -4,69 +4,339 @@
 {% block title %}Teams{% endblock %}
 
 {% block content %}
-<div class="container my-4">
-    <div class="row mb-4 justify-content-center">
-        <div class="col-md-8">
-            <h2>Select a Team</h2>
-        </div>
-        <div class="col-md-4 text-end">
-            <form method="get" class="d-inline">
-                <select name="team_id" class="form-select d-inline w-auto" onchange="this.form.submit()">
-                    <option value="">-- Choose a Team --</option>
-                    {% for team in teams %}
-                        <option value="{{ team.id }}" {% if selected_team and team.id == selected_team.id %}selected{% endif %}>
-                            {{ team.team_name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </form>
-        </div>
-    </div>
+<style>
+    /* Container styling */
+    .container {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+        color: #e0e0e0; /* light text for dark background */
+        background: transparent;
+    }
+
+    .card {
+        background: #1f2329; /* dark card background */
+        border-radius: 1rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+        padding: 2rem;
+        max-width: 960px;
+        margin: auto;
+        animation: fadeInUp 0.6s ease forwards;
+        color: #e0e0e0;
+    }
+
+    /* Table container */
+    .table-responsive {
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+        margin-bottom: 1.5rem;
+    }
+
+    /* Table styles */
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 1rem;
+        color: #e0e0e0;
+        background-color: #2c2f33;
+        transition: box-shadow 0.3s ease;
+    }
+
+    thead tr {
+        background: linear-gradient(90deg, #23272a, #2a2d31);
+        border-bottom: 2px solid #444;
+    }
+
+    thead th {
+        padding: 1rem 1.5rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #aeb0b5;
+        user-select: none;
+    }
+
+    thead th:first-child {
+        border-top-left-radius: 1rem;
+    }
+
+    thead th:last-child {
+        border-top-right-radius: 1rem;
+    }
+
+    tbody tr {
+        background-color: #33363b;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        cursor: default;
+    }
+
+    tbody tr:hover {
+        background-color: #40444b;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+    }
+
+    tbody tr:last-child td:first-child {
+        border-bottom-left-radius: 1rem;
+    }
+
+    tbody tr:last-child td:last-child {
+        border-bottom-right-radius: 1rem;
+    }
+
+    tbody td {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #444;
+        vertical-align: middle;
+    }
+
+    tbody td:last-child {
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    /* Select dropdown */
+    select.form-select {
+        appearance: none;
+        background: #2c2f33;
+        border: 1px solid #555;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        color: #e0e0e0;
+        padding: 0.5rem 1rem;
+        margin-bottom: 1.5rem;
+        cursor: pointer;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        outline: none;
+        box-shadow: none;
+    }
+
+    select.form-select:hover,
+    select.form-select:focus {
+        border-color: #00aaff;
+        box-shadow: 0 0 8px #00aaff;
+        background-color: #394049;
+        color: #fff;
+    }
+
+    select.form-select option {
+        background-color: #2c2f33;
+        color: #e0e0e0;
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 0.5rem !important;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 2px solid transparent;
+        padding: 0.35rem 0.75rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        user-select: none;
+        color: #fff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        background-clip: padding-box;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #0069d9;
+        border-color: #0062cc;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #212529;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+        color: #212529;
+    }
+
+    /* Flex container for action buttons */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Heading */
+    h2.fw-bold {
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 2rem;
+        text-align: left;
+        color: #e0e0e0;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="container">
+    <h2 class="fw-bold">Select a Team</h2>
+
+    <form method="get" class="mb-4">
+        <select name="team_id" class="form-select" onchange="this.form.submit()">
+            <option value="">-- Choose a Team --</option>
+            {% for team in teams %}
+                <option value="{{ team.id }}" {% if selected_team and team.id == selected_team.id %}selected{% endif %}>
+                    {{ team.team_name }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
 
     {% if selected_team %}
-        <div class="card shadow-sm mx-auto" style="width: 80%; max-width: 900px;">
-            <div class="card-body">
-                <h4 class="card-title text-center">{{ selected_team.team_name }}</h4>
+    <div class="card">
+        <h3 class="text-center mb-4">{{ selected_team.team_name }}</h3>
 
-                {% if selected_team.team_logo %}
-                    <img src="{{ selected_team.team_logo.url }}" alt="{{ selected_team.team_name }} logo" class="img-fluid my-3" style="max-height: 150px; display: block; margin-left: auto; margin-right: auto;">
-                {% endif %}
+        {% if selected_team.team_logo %}
+            <img src="{{ selected_team.team_logo.url }}" alt="{{ selected_team.team_name }} logo"
+                class="img-fluid mx-auto d-block mb-4 rounded shadow" style="max-height: 150px;">
+        {% endif %}
 
-                <table class="table table-bordered table-striped align-middle mt-3">
-                    <thead class="table-dark">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Age</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in players %}
                         <tr>
-                            <th>Name</th>
-                            <th>Position</th>
-                            <th>Age</th>
-                            <th>Actions</th>
+                            <td>{{ player.name }}</td>
+                            <td>{{ player.position }}</td>
+                            <td>{{ player.age }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'add_player_stats' player.id %}" class="btn btn-success btn-sm" title="Add Stats">
+                                        + Stats
+                                    </a>
+                                    <a href="{% url 'player_stats' player.id %}" class="btn btn-primary btn-sm" title="View Stats">
+                                        View Stats
+                                    </a>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="deletePlayer({{ player.id }}, '{{ player.name }}')" title="Delete Player">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for player in players %}
-                            <tr>
-                                <td>{{ player.name }}</td>
-                                <td>{{ player.position }}</td>
-                                <td>{{ player.age }}</td>
-                                <td>
-                                    <div class="d-flex gap-3 justify-content-center">
-                                        <a href="{% url 'add_player_stats' player.id %}" class="btn btn-success btn-sm">Add Stats</a>
-                                        <a href="{% url 'player_stats' player.id %}" class="btn btn-primary btn-sm">View Stats</a>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center">No players in this team.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
-                <div class="text-end">
-                    <a href="{% url 'add_player' %}" class="btn btn-warning">Add Player</a>
-                </div>
-            </div>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No players in this team.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+
+        <div class="text-end mt-4">
+            <a href="{% url 'add_player' %}" class="btn btn-warning px-4 py-2 shadow">
+                Add Player
+            </a>
+        </div>
+    </div>
     {% endif %}
 </div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function deletePlayer(playerId, playerName) {
+    if(confirm(`Are you sure you want to delete player "${playerName}"? This action cannot be undone.`)) {
+        fetch("{% url 'delete_player' 0 %}".replace('0', playerId), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                alert('Player deleted successfully.');
+                const row = document.querySelector(`button[onclick="deletePlayer(${playerId}, '${playerName}')"]`).closest('tr');
+                if(row) row.remove();
+            } else {
+                alert('Error deleting player: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => alert('Request failed: ' + error));
+    }
+}
+</script>
 {% endblock %}

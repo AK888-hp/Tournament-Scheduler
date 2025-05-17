@@ -3,32 +3,154 @@
 {% block title %}Player List{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Player List</h2>
+<style>
+  .table-container {
+    max-width: 900px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
 
-    {% if players %}
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Player Name</th>
-                    <th scope="col">Team</th>
-                    <th scope="col">Position</th>  <!-- Changed role to position -->
-                    <th scope="col">Age</th>        <!-- Assuming you have age -->
-                </tr>
-            </thead>
-            <tbody>
-                {% for player in players %}
-                    <tr>
-                        <td>{{ player.name }}</td>  <!-- Correct field name -->
-                        <td>{{ player.team.team_name }}</td>  <!-- Access team name -->
-                        <td>{{ player.position }}</td>  <!-- Correct field name -->
-                        <td>{{ player.age }}</td>  <!-- Assuming you have age -->
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p class="text-center">No players found.</p>
-    {% endif %}
+  .table {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .table thead th {
+    background-color: #004085;
+    color: #fff;
+    border: none;
+  }
+
+  .table tbody tr:hover {
+    background-color: #e2e6ea;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-rounded {
+    border-radius: 50px;
+    margin-right: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .btn-rounded:hover {
+    transform: scale(1.05);
+  }
+
+  .alert-top {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1050;
+    max-width: 600px;
+    width: 90%;
+    border-radius: 12px;
+  }
+</style>
+
+<div class="table-container mt-5">
+  <h2 class="text-center mb-4 text-uppercase">Player List</h2>
+
+  <div id="alert-placeholder"></div>
+
+  {% if players %}
+  <table class="table table-striped shadow-sm">
+    <thead>
+      <tr>
+        <th scope="col">Player Name</th>
+        <th scope="col">Team</th>
+        <th scope="col">Position</th>
+        <th scope="col">Age</th>
+        <th scope="col" class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for player in players %}
+      <tr id="player-row-{{ player.id }}">
+        <td>{{ player.name }}</td>
+        <td>{{ player.team.team_name }}</td>
+        <td>{{ player.position }}</td>
+        <td>{{ player.age }}</td>
+        <td class="text-center">
+          <a href="{% url 'add_player_stats' player.id %}" class="btn btn-sm btn-primary btn-rounded">Add Stats</a>
+          <a href="{% url 'player_stats' player.id %}" class="btn btn-sm btn-info btn-rounded">View Stats</a>
+          <button class="btn btn-sm btn-danger btn-rounded" onclick="confirmDeletePlayer({{ player.id }}, '{{ player.name }}')">Delete</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p class="text-center text-muted">No players found.</p>
+  {% endif %}
 </div>
+
+<script>
+// CSRF token helper from Django docs
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+function showAlert(message, type = 'danger') {
+    const alertPlaceholder = document.getElementById('alert-placeholder');
+    alertPlaceholder.innerHTML = `
+      <div class="alert alert-${type} alert-top alert-dismissible fade show" role="alert">
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    `;
+}
+
+function confirmDeletePlayer(playerId, playerName) {
+    if (confirm(`Are you sure you want to delete player "${playerName}"? This action cannot be undone.`)) {
+        deletePlayer(playerId);
+    }
+}
+
+function deletePlayer(playerId) {
+    fetch(`/delete_player/${playerId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'Accept': 'application/json',
+        },
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not OK');
+      return response.json();
+    })
+    .then(data => {
+      if(data.success) {
+        // Remove the player row from the table
+        const row = document.getElementById(`player-row-${playerId}`);
+        if (row) row.remove();
+
+        showAlert('Player deleted successfully.', 'success');
+      } else {
+        showAlert('Failed to delete player.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showAlert('An error occurred while deleting player.');
+    });
+}
+</script>
 {% endblock %}

@@ -1,40 +1,50 @@
 {% extends 'myapp/base.html' %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Schedule Matches{% endblock %}
 
 {% block content %}
-    <div class="container mt-5 pt-5">
-        <h1 class="mb-4">Schedule Matches</h1>
+<div class="container mt-5 pt-5 text-white">
+    <div class="bg-dark bg-opacity-75 p-5 rounded-4 shadow-lg animate__animated animate__fadeIn">
+        <h1 class="mb-4 text-center fw-bold">Schedule Matches</h1>
 
-        <form method="POST">
+        <form method="POST" class="needs-validation" novalidate>
             {% csrf_token %}
-            <div class="mb-3">
-                <label for="start_date" class="form-label">Start Date:</label>
-                <input type="date" name="start_date" id="start_date" class="form-control" required>
+            <div class="mb-4">
+                <label for="start_date" class="form-label fs-5">Start Date</label>
+                <input type="date" name="start_date" id="start_date" class="form-control rounded-3 shadow-sm" required>
             </div>
-            <button type="submit" class="btn btn-primary">Generate Schedule</button>
+            <div class="text-center">
+                <button type="submit" class="btn btn-success px-4 py-2 rounded-3 shadow">
+                    <i class="bi bi-calendar-check"></i> Generate Schedule
+                </button>
+            </div>
         </form>
 
         {% if scheduled_matches %}
-            <h2 class="mt-5">Scheduled Matches</h2>
-            <table class="table table-bordered mt-3">
-                <thead>
-                    <tr>
-                        <th>Match</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for match in scheduled_matches %}
+        <div class="mt-5">
+            <h2 class="text-center mb-4">Scheduled Matches</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-striped text-white rounded-4 overflow-hidden shadow-sm bg-opacity-75 bg-secondary animate__animated animate__fadeInUp">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Match</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for match in scheduled_matches %}
                         <tr>
                             <td>{{ match.team1 }} vs {{ match.team2 }}</td>
                             <td>{{ match.match_date|date:"F j, Y" }}</td>
                             <td>{{ match.start_time|time:"g:i A" }} - {{ match.end_time|time:"g:i A" }}</td>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
         {% endif %}
     </div>
+</div>
 {% endblock %}
